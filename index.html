@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 Bhumi's Birthday Surprise! 🎉</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fce7f3; /* Light Pink Background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- Gift Box Opening Animation --- */
+        .gift-box-container {
+            position: relative;
+            width: 160px; /* Adjusted size for better appearance */
+            height: 160px;
+            perspective: 1000px;
+            margin: 0 auto;
+        }
+
+        .box-base {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #e53e3e; /* Red-500 */
+            border-radius: 8px;
+            border: 4px solid #f6e05e; /* Yellow-300 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .box-lid {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background-color: #c53030; /* Red-700 */
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            border: 4px solid #f6e05e; /* Yellow-300 */
+            border-bottom: none;
+            top: -20px; /* Positioned slightly above the base */
+            transform-origin: bottom center; /* Pivot from the bottom edge */
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 1s ease-out, top 1s ease-out; /* Smooth transition */
+            z-index: 10; /* Lid should be on top */
+        }
+        
+        .bow-h, .bow-v, .bow-knot {
+            background-color: #f6e05e; /* Yellow-300 */
+            position: absolute;
+            z-index: 11;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .bow-h { width: 100%; height: 16px; top: calc(50% - 8px); left: 0; }
+        .bow-v { height: 100%; width: 16px; left: calc(50% - 8px); top: 0; }
+        .bow-knot { width: 30px; height: 30px; border-radius: 50%; top: calc(50% - 15px); left: calc(50% - 15px); }
+
+
+        .open-animation .box-lid {
+            transform: rotateX(90deg) translateY(-80px); /* Open upwards and rotate */
+            top: -80px; /* Move far up */
+            opacity: 0; /* Fade out lid */
+        }
+
+        .open-animation .box-base {
+            animation: bounceBox 0.8s ease-out forwards; /* Base bounces slightly */
+        }
+        
+        @keyframes bounceBox {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+
+        /* --- Confetti Burst Animation --- */
+        @keyframes burstConfetti {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; transform: scale(1) rotate(calc(var(--rand-rot) * 1deg)); }
+            100% { 
+                transform: translate(calc(var(--rand-x) * 1px), calc(var(--rand-y) * 1px)) rotate(calc(var(--rand-rot) * 1deg)); 
+                opacity: 0; 
+            }
+        }
+        .confetti-piece {
+            position: absolute;
+            width: var(--size);
+            height: var(--size);
+            background-color: var(--color);
+            border-radius: var(--radius);
+            top: 50%;
+            left: 50%;
+            animation: burstConfetti var(--duration) ease-out forwards;
+            animation-delay: var(--delay);
+            z-index: 10;
+        }
+
+        /* --- Reveal Content Animation --- */
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .content-reveal-animation {
+            animation: fadeInScale 0.8s ease-out forwards;
+        }
+
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- App Container --><div id="app" class="w-full max-w-sm mx-auto bg-white rounded-3xl shadow-2xl transition-all duration-500 min-h-[400px] flex flex-col relative overflow-hidden">
+        
+        <!-- Confetti Layer --><div id="confetti-layer" class="absolute inset-0 hidden"></div>
+        
+        <!-- Cover Screen --><div id="cover-screen" class="absolute inset-0 p-6 flex flex-col justify-between text-center transition-opacity duration-500 z-20">
+            <h1 class="text-3xl font-black text-pink-600 mb-6">A Special Birthday Surprise Awaits!</h1>
+
+            <!-- Gift Box Illustration (HTML structure for animation) --><div class="gift-box-container mb-8">
+                <div id="box-base" class="box-base"></div>
+                <div id="box-lid" class="box-lid">
+                    <div class="bow-h"></div>
+                    <div class="bow-v"></div>
+                    <div class="bow-knot"></div>
+                </div>
+            </div>
+
+            <button id="open-button"
+                    class="w-full py-4 text-white font-black text-lg bg-pink-500 hover:bg-pink-600 rounded-xl shadow-lg transition duration-300 transform hover:scale-105 active:scale-95">
+                🎁 Tap to Open Your Gift
+            </button>
+        </div>
+
+        <!-- Reveal Content (The Message) --><div id="reveal-screen" class="absolute inset-0 p-6 hidden flex flex-col justify-center items-center text-center z-20">
+            <div class="bg-yellow-50 rounded-2xl p-6 shadow-xl w-full max-w-xs transition-opacity duration-500">
+                
+                <div class="text-5xl my-8 content-reveal" style="animation-delay: 0.5s;"> 
+                    🎉🥳🎂
+                </div>
+                
+                <h2 class="text-4xl font-black text-pink-600 mb-4 content-reveal" style="animation-delay: 0.8s;">Happy Birthday, Bhumi!</h2>
+
+                <p class="text-gray-700 text-lg font-semibold content-reveal" style="animation-delay: 1.2s;">
+                    Wishing the most wonderful person a day filled with joy and laughter. You are amazing! 
+                </p>
+                <div class="text-5xl mt-6 content-reveal" style="animation-delay: 1.6s;">
+                    ❤️
+                </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-6 text-center">Sent with love via a digital surprise.</p>
+        </div>
+    </div>
+
+    <script>
+        const openButton = document.getElementById('open-button');
+        const coverScreen = document.getElementById('cover-screen');
+        const revealScreen = document.getElementById('reveal-screen');
+        const giftBoxContainer = document.querySelector('.gift-box-container'); // Get the container for box animations
+        const confettiLayer = document.getElementById('confetti-layer');
+
+        const colors = ['#ff7f99', '#ffcc00', '#4CAF50', '#2196F3', '#9C27B0']; // Confetti colors
+
+        function generateConfetti() {
+            for (let i = 0; i < 50; i++) { // Generate more pieces
+                const piece = document.createElement('div');
+                piece.classList.add('confetti-piece');
+                
+                // Randomize properties
+                const size = Math.random() * 10 + 5; // 5px to 15px
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const radius = Math.random() > 0.5 ? '50%' : '0%'; // Circle or square
+                const duration = Math.random() * 2 + 2; // 2s to 4s
+                const delay = Math.random() * 0.5; // 0s to 0.5s
+                const randX = Math.random() * 400 - 200; // -200px to 200px horizontal spread
+                const randY = Math.random() * 400 - 200; // -200px to 200px vertical spread
+                const randRot = Math.random() * 1080 - 540; // -540deg to 540deg rotation
+
+                piece.style.setProperty('--size', `${size}px`);
+                piece.style.setProperty('--color', color);
+                piece.style.setProperty('--radius', radius);
+                piece.style.setProperty('--duration', `${duration}s`);
+                piece.style.setProperty('--delay', `${delay}s`);
+                piece.style.setProperty('--rand-x', randX);
+                piece.style.setProperty('--rand-y', randY);
+                piece.style.setProperty('--rand-rot', randRot);
+                
+                confettiLayer.appendChild(piece);
+            }
+        }
+
+        function handleOpenGift(e) {
+            if (e && e.type === 'touchstart') {
+                e.preventDefault(); 
+            }
+            if (openButton.disabled) return;
+
+            openButton.disabled = true;
+            openButton.textContent = 'Opening...';
+
+            // 1. Start Box Animation
+            giftBoxContainer.classList.add('open-animation'); // Apply combined animation class
+            
+            // 2. Generate and Show Confetti
+            generateConfetti();
+            confettiLayer.classList.remove('hidden');
+
+            // 3. Fade out cover and reveal content
+            setTimeout(() => {
+                coverScreen.style.opacity = '0';
+            }, 800); // Start fading cover after box begins opening
+
+            setTimeout(() => {
+                coverScreen.classList.add('hidden');
+                revealScreen.classList.remove('hidden');
+
+                const revealElements = document.querySelectorAll('#reveal-screen .content-reveal');
+
+                revealElements.forEach((el, index) => {
+                    setTimeout(() => {
+                         el.classList.add('content-reveal-animation'); // Apply new reveal animation
+                    }, index * 300); // Stagger faster
+                });
+
+            }, 1800); // Give enough time for box and fade
+        }
+
+        openButton.addEventListener('click', handleOpenGift);
+        openButton.addEventListener('touchstart', handleOpenGift, { passive: false }); 
+    </script>
+</body>
+</html>
